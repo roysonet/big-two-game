@@ -131,16 +131,22 @@ function clearSelectedCards() {
 function aiTurn() {
     let played = false;
     const aiHand = aiHands[currentPlayer - 1];
+    console.log(`AI ${currentPlayer} turn beginning. Hand:`, aiHand);
+    console.log(`Current play:`, currentPlay);
+
+    if (!aiHand || !Array.isArray(aiHand)) {
+        console.error(`Invalid AI hand for player ${currentPlayer}. aiHands:`, aiHands);
+        return;
+    }
 
     if (currentPlay === null || currentPlay.player === currentPlayer) {
         // AI starts the round
-        const play = findValidPlay(aiHand, currentPlay); // Find *any* valid play
+        const play = findValidPlay(aiHand, null);
         if (play) {
-          currentPlay = { player: currentPlayer, cards: play, type: getPlayType(play) };
-          updateMessage(`AI ${currentPlayer} plays ${currentPlay.type}`);
-          played = true;
+            currentPlay = { player: currentPlayer, cards: play, type: getPlayType(play) };
+            updateMessage(`AI ${currentPlayer} plays ${currentPlay.type}`);
+            played = true;
         }
-
     } else {
         // AI needs to beat the current play
         const play = findValidPlay(aiHand, currentPlay);
@@ -155,7 +161,9 @@ function aiTurn() {
         // Remove played cards from AI's hand
         for (const card of currentPlay.cards) {
             const index = aiHand.findIndex(c => c.suit === card.suit && c.rank === card.rank);
-            aiHand.splice(index, 1);
+            if (index > -1) {
+                aiHand.splice(index, 1);
+            }
         }
         lastPlayer = currentPlayer;
         currentPlayer = (currentPlayer + 1) % 4;
@@ -164,10 +172,14 @@ function aiTurn() {
         currentPlayer = (currentPlayer + 1) % 4;
     }
 
+    // Validate AI hand after play
+    console.log(`AI ${currentPlayer - 1} hand after play:`, aiHand);
+    
     renderHands();
     renderTable();
     nextTurn();
 }
+
 function updatePlayerTurnHighlight() {
     const playerHandElement = document.getElementById('player-hand');
     playerHandElement.classList.remove('active-turn'); // Remove from everyone
@@ -179,7 +191,7 @@ function updatePlayerTurnHighlight() {
 function startTimer() {
     clearInterval(timerInterval); // Clear any existing timer
 
-    let timeLeft = 10;
+    let timeLeft = 30; // Changed from 10 to 30 seconds
     updateMessage(`Time left: ${timeLeft}`);
 
     timerInterval = setInterval(() => {

@@ -1,0 +1,4 @@
+he css with /* Placeholder image.  Replace with a real card back image. */
+    /* You can use any image you like for the card back. */
+    /* This is just a placeholder so the game will run even if you don't have all the card images yet. */
+    /* Make sure the image is named back.png and is in the src/assets/cards directory. */
